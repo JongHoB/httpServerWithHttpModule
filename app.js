@@ -37,9 +37,10 @@ const users = [
     const {url,method}=request;
     if(method=="GET"){
         response.writeHead(200,{"Content-Type": "application/json"});
-        response.end("<h1>Hello World!</h1>");
+        response.end("Hello World!");
     }
     if(method=="POST"){
+        if(url==="/users"){
         let body="";
         request.on("data",(chunk)=>{
             body+=chunk;});
@@ -54,6 +55,24 @@ const users = [
             response.writeHead(200,{"Content-Type": "application/json"});
             response.end(JSON.stringify({message:"userCreated"}))})
         }
+        if(url==="/posts"){
+            let body="";
+            request.on("data",(chunk)=>{
+                body+=chunk;});
+            request.on("end",()=>{
+                const post= JSON.parse(body);
+                posts.push({
+                    id:post.id,
+                    title:post.title,
+                    content:post.content,
+                    userId:post.userId,
+            })
+            response.writeHead(200,{"Content-Type": "application/json"});
+            response.end(JSON.stringify({message:"postCreated"}));
+        }
+            )
+        }
+    }
 
         }
 
