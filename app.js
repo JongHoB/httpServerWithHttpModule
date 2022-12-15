@@ -102,20 +102,37 @@ const users = [
     if(method=="PATCH"){
         if(url==="/modify"){
             let body="";
-            let postingId;
             request.on("data",(chunk)=>{
                 body+=chunk;});
             request.on("end",()=>{
-                const content= JSON.parse(body);
-                postingId=content.id;
+                const postingId= JSON.parse(body).id;
                 posts[postingId-1].content=content.content;
                 response.writeHead(200,{"Content-Type": "application/json"});
                 response.end(JSON.stringify({data:postingReturn(posts[postingId-1])}));
             }
             );        
         }
-        }  
+        } 
+    if(method=="DELETE"){ 
+        if(url==="/delete"){
+            let body="";
+            let postingId;
+            request.on("data",(chunk)=>{
+                body+=chunk;});
+            request.on("end",()=>{
+                const deleteId=JSON.parse(body).id;
+                posts.splice(deleteId-1,1);
+                for(let i=deleteId-1; i<posts.length; i++) {
+                    posts[i].id=i+1;
+                }         
+                console.log(posts);
+                response.writeHead(200,{"Content-Type": "application/json"});
+                response.end(JSON.stringify({message:"postingDeleted"}));
+            })
+
     }
+    }
+  }
   const IP="127.0.0.1";
   const PORT=8000;
   server.on("request", httpRequestListener);
