@@ -26,7 +26,7 @@ const users = [
       id: 2,
       title: "HTTP의 특성",
       content: "Request/Response와 Stateless!!",
-      userId: 1,
+      userId: 2,
     },
   ];
 
@@ -36,8 +36,33 @@ const users = [
   const httpRequestListener= function(request, response){
     const {url,method}=request;
     if(method=="GET"){
-        response.writeHead(200,{"Content-Type": "application/json"});
-        response.end("Hello World!");
+        if(url==="/get"){
+            let body=[];
+            request.on("data",()=>{              
+
+            });
+            request.on("end",()=>{
+                for(let i in posts){
+                    body.push({
+                        userID:posts[i].userId,
+                        userName:users[posts[i].userId-1].name,
+                        postingId:posts[i].id,
+                        postingTitle:posts[i].title,
+                        postingContent:posts[i].content,
+                    })
+                }
+                response.writeHead(200,{"Content-Type": "application/json"});
+                response.end(JSON.stringify({data:body}));
+            })
+            
+        }
+        else{
+            response.writeHead(200,{"Content-Type": "application/json"});
+            response.end("Hello World!");
+        }
+
+        
+
     }
     if(method=="POST"){
         if(url==="/users"){
@@ -72,6 +97,7 @@ const users = [
         }
             )
         }
+        
     }
 
         }
