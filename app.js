@@ -30,6 +30,17 @@ const users = [
     },
   ];
 
+
+  function postingReturn(post){
+    return {
+        userId:post.userId,
+        userName:users[post.userId-1].name,
+        postingId:post.id,
+        postingTitle:post.title,
+        postingContent:post.content,
+    }
+  }
+  
   const http=require("http");
   const server=http.createServer();
 
@@ -38,31 +49,20 @@ const users = [
     if(method=="GET"){
         if(url==="/get"){
             let body=[];
-            request.on("data",()=>{              
-
+            request.on("data",()=>{    
             });
             request.on("end",()=>{
                 for(let i in posts){
-                    body.push({
-                        userID:posts[i].userId,
-                        userName:users[posts[i].userId-1].name,
-                        postingId:posts[i].id,
-                        postingTitle:posts[i].title,
-                        postingContent:posts[i].content,
-                    })
+                    body.push(postingReturn(posts[i]))
                 }
                 response.writeHead(200,{"Content-Type": "application/json"});
                 response.end(JSON.stringify({data:body}));
             })
-            
         }
         else{
             response.writeHead(200,{"Content-Type": "application/json"});
             response.end("Hello World!");
-        }
-
-        
-
+        }       
     }
     if(method=="POST"){
         if(url==="/users"){
@@ -97,17 +97,28 @@ const users = [
         }
             )
         }
-        
+
     }
-
+    if(method=="PATCH"){
+        if(url==="/modify"){
+            let body="";
+            let postingId;
+            request.on("data",(chunk)=>{
+                body+=chunk;});
+            request.on("end",()=>{
+                const content= JSON.parse(body);
+                postingId=content.id;
+                posts[postingId-1].content=content.content;
+                response.writeHead(200,{"Content-Type": "application/json"});
+                response.end(JSON.stringify({data:postingReturn(posts[postingId-1])}));
+            }
+            );        
         }
-
-    
-
+        }  
+    }
   const IP="127.0.0.1";
   const PORT=8000;
   server.on("request", httpRequestListener);
-
   server.listen(PORT, IP, () => {
     console.log(`Server is running at http://${IP}:${PORT}`);
   });
