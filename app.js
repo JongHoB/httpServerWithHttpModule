@@ -52,12 +52,40 @@ const users = [
             request.on("data",()=>{    
             });
             request.on("end",()=>{
-                for(let i in posts){
+                for(let i in posts){2
                     body.push(postingReturn(posts[i]))
                 }
                 response.writeHead(200,{"Content-Type": "application/json"});
                 response.end(JSON.stringify({data:body}));
             })
+        }
+        else if(url=="/get/user"){
+            let body="";
+            request.on("data",(chunk)=>{
+                body+=chunk;
+            });
+            request.on("end",()=>{
+                const userId=JSON.parse(body).id;
+                const userObj={
+                    userID:userId,
+                    userName:users[userId-1].name,
+                    postings:[]
+                };
+                posts.forEach(post=>{
+                    
+                    if(post.userId==userId){
+                        let tempObj={};
+                        tempObj.postingId=post.id;
+                        tempObj.postingTitle=post.title;
+                        tempObj.postingContent=post.content;
+                        userObj.postings.push(tempObj);
+                    }
+                    
+                });
+            response.writeHead(200,{"Content-Type": "application/json"});
+            response.end(JSON.stringify({data:userObj}));
+                
+            });
         }
         else{
             response.writeHead(200,{"Content-Type": "application/json"});
@@ -125,11 +153,9 @@ const users = [
                 for(let i=deleteId-1; i<posts.length; i++) {
                     posts[i].id=i+1;
                 }         
-                console.log(posts);
                 response.writeHead(200,{"Content-Type": "application/json"});
                 response.end(JSON.stringify({message:"postingDeleted"}));
             })
-
     }
     }
   }
